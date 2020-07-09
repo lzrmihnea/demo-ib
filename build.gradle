@@ -1,0 +1,50 @@
+buildscript {
+	ext {
+		springBootVersion = "2.3.1.RELEASE"
+		springDepedencyManagementVersion = "1.0.9.RELEASE"
+		swaggerVersion = "2.1.3"
+		lombokPluginVersion = "4.1.6"
+		springfoxVersion="2.9.2"
+		tupleVersion="1.2"
+	}
+}
+
+plugins {
+	id 'org.springframework.boot' version "$springBootVersion"
+	id 'io.spring.dependency-management' version "$springDepedencyManagementVersion"
+	id 'java'
+	id 'idea'
+	id "io.freefair.lombok" version "$lombokPluginVersion"
+}
+
+group = 'eu.ib'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	compile group: 'io.swagger.core.v3', name: 'swagger-annotations', version: swaggerVersion
+	compile group: 'io.swagger.core.v3', name: 'swagger-core', version: swaggerVersion
+
+	compile(group: 'io.springfox', name: 'springfox-swagger2', version: springfoxVersion) {
+		exclude module: 'mapstruct'
+	}
+	compile group: 'io.springfox', name: 'springfox-swagger-ui', version: springfoxVersion
+
+	compile group: 'org.javatuples', name: 'javatuples', version: tupleVersion
+
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+	testImplementation 'io.projectreactor:reactor-test'
+}
+
+test {
+	useJUnitPlatform()
+}
