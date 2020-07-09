@@ -2,6 +2,7 @@ package eu.ib.demoib.service;
 
 import eu.ib.demoib.api.model.dto.ConversionResponseDto;
 import eu.ib.demoib.client.ExchangeRateApiFacade;
+import eu.ib.demoib.client.model.ExchangeApiResponseDto;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,12 +17,20 @@ public class CurrencyConversionAggregationService {
     }
 
     public ConversionResponseDto exchangeCurrency(String from, String to, BigDecimal fromAmount) {
-        ConversionResponseDto response = new ConversionResponseDto(from, to, fromAmount);
-        this.exchangeRateApiFacade.exchangeFrom(from)
-                .subscribe(consumer -> {
-                    BigDecimal toRate = consumer.getRates().get(to);
-                    response.setConverted(toRate.multiply(fromAmount));
-                });
-        return response;
+        ExchangeApiResponseDto exchangeRateDto = this.exchangeRateApiFacade.getConvertedAmount(from, to, fromAmount);
+        BigDecimal convertedAmount = getConvertedAmount(to, fromAmount, exchangeRateDto);
+        return new ConversionResponseDto(from, to, fromAmount, convertedAmount);
     }
+
+    private BigDecimal getConvertedAmount(String to, BigDecimal fromAmount, ExchangeApiResponseDto consumer) {
+        if (consumer == null || consumer.getRates() == null) {
+            return null;
+        }
+        BigDecimal toRate = consumer.getRates().get(to);
+        if (toRate == null) {
+            return null;
+        }
+        return fromAmount.multiply(toRate);
+    }
+
 }
