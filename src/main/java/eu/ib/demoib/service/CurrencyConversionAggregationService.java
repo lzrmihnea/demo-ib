@@ -17,7 +17,7 @@ public class CurrencyConversionAggregationService {
     }
 
     public ConversionResponseDto exchangeCurrency(String from, String to, BigDecimal fromAmount) {
-        ExchangeApiResponseDto exchangeRateDto = this.exchangeRateApiFacade.getConvertedAmount(from, to, fromAmount);
+        ExchangeApiResponseDto exchangeRateDto = this.exchangeRateApiFacade.getConvertedAmount(from, to);
         BigDecimal convertedAmount = getConvertedAmount(to, fromAmount, exchangeRateDto);
         return new ConversionResponseDto(from, to, fromAmount, convertedAmount);
     }

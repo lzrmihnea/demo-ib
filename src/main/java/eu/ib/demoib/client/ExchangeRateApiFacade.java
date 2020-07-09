@@ -1,6 +1,5 @@
 package eu.ib.demoib.client;
 
-import com.google.common.collect.Lists;
 import eu.ib.demoib.client.model.ExchangeApiResponseDto;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
@@ -13,7 +12,6 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -21,18 +19,13 @@ public class ExchangeRateApiFacade {
 
     private static final Logger LOG = LoggerFactory.getLogger(ExchangeRateApiFacade.class);
 
-    private static final String CLIENT_EXCHANGE_RATE_API_LATEST_URL = "https://api.exchangeratesapi.io/latest?base=";
-    private static final String CLIENT_EXCHANGE_RATE_API_V4_URL = "https://api.exchangerate-api.com/v4/latest/";
+    private final List<Pair<WebClient, String>> webClientWithUrls;
 
-    private final WebClient webClientLatest = WebClient.builder().baseUrl(CLIENT_EXCHANGE_RATE_API_LATEST_URL).build();
-    private final WebClient webClientV4 = WebClient.builder().baseUrl(CLIENT_EXCHANGE_RATE_API_V4_URL).build();
+    public ExchangeRateApiFacade(List<Pair<WebClient, String>> webClientWithUrls) {
+        this.webClientWithUrls = webClientWithUrls;
+    }
 
-    private final List<Pair<WebClient, String>> webClientWithUrls =
-            Lists.newArrayList(
-                    Pair.with(webClientLatest, CLIENT_EXCHANGE_RATE_API_LATEST_URL),
-                    Pair.with(webClientV4, CLIENT_EXCHANGE_RATE_API_V4_URL));
-
-    public ExchangeApiResponseDto getConvertedAmount(String from, String to, BigDecimal fromAmount) {
+    public ExchangeApiResponseDto getConvertedAmount(String from, String to) {
         for (Pair<WebClient, String> clientWithUrl : webClientWithUrls) {
             ExchangeApiResponseDto exchangeRates = getExchangeRates(clientWithUrl, from);
             if (isResponseValid(to, exchangeRates)) {
