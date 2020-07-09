@@ -1,13 +1,13 @@
 package eu.ib.demoib.api;
 
-import eu.ib.demoib.client.model.ExchangeApiResponseDto;
+import eu.ib.demoib.api.model.dto.ConversionRequestDto;
+import eu.ib.demoib.api.model.dto.ConversionResponseDto;
 import eu.ib.demoib.service.CurrencyConversionAggregationService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping("/currency/convert")
@@ -28,8 +28,13 @@ public class CurrencyConverterController {
 //    @ApiResponse(responseCode = "404", description = "Cancellation failed, no subscription found for given autoRenewalId", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema))
 //    @ResponseStatus(HttpStatus.NO_CONTENT)
     @GetMapping
-    public Mono<ExchangeApiResponseDto> convertCurrency() {
-        return currencyConversionAggregationService.exchangeCurrency("EUR", "USD");
+    public ConversionResponseDto convertCurrency() {
+        return currencyConversionAggregationService.exchangeCurrency("EUR", "USD", null);
+    }
+
+    @PostMapping
+    public ConversionResponseDto convertCurrencyFrom(@RequestBody  ConversionRequestDto request) {
+        return currencyConversionAggregationService.exchangeCurrency(request.getFrom(), request.getTo(), request.getAmount());
     }
 
 //    private void print(ExchangeApiResponseDto exchangeApiResponseDto) {

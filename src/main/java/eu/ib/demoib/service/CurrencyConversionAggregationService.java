@@ -1,5 +1,6 @@
 package eu.ib.demoib.service;
 
+import eu.ib.demoib.api.model.dto.ConversionResponseDto;
 import eu.ib.demoib.client.ExchangeRateApiFacade;
 import eu.ib.demoib.client.model.ExchangeApiResponseDto;
 import org.springframework.stereotype.Service;
@@ -16,14 +17,14 @@ public class CurrencyConversionAggregationService {
         this.exchangeRateApiFacade = exchangeRateApiFacade;
     }
 
-    public Mono<ExchangeApiResponseDto> exchangeCurrency(String from, String to) {
-        BigDecimal fromAmount = BigDecimal.valueOf(10.1);
+    public ConversionResponseDto exchangeCurrency(String from, String to, BigDecimal fromAmount) {
         Mono<ExchangeApiResponseDto> exchangeApiResponseDtoMono = this.exchangeRateApiFacade.exchangeFrom(from);
-        Mono<BigDecimal> map = exchangeApiResponseDtoMono
+        Mono<BigDecimal> convertedAmount = exchangeApiResponseDtoMono
                 .map(consumer -> {
                     BigDecimal toRate = consumer.getRates().get(to);
                     return toRate.multiply(fromAmount);
                 });
-        return exchangeApiResponseDtoMono;
+
+        return new ConversionResponseDto(from, to, fromAmount, convertedAmount.block());
     }
 }
